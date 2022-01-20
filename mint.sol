@@ -1126,27 +1126,27 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
     mapping(uint256 => address) public minter;   //returs minter of a token id
     mapping(address => uint256[]) public mintedByUser;
     uint256 public awakeningLimit = 2623;
-    uint256 public wishlistOneLimit = 5000;
-    uint256 public wishlistTwoLimit = 6500;
+    uint256 public whitelistOneLimit = 5000;
+    uint256 public whitelistTwoLimit = 6500;
     uint256 public publicSaleLimit = 7777;
     uint256 public awakeningUserLimit = 24;
-    uint256 public wishlistOneUserLimit = 12;
-    uint256 public wishlistTwoUserLimit = 12;
+    uint256 public whitelistOneUserLimit = 12;
+    uint256 public whitelistTwoUserLimit = 12;
     uint256 public publicSaleUserLimit = 12;
     uint256 public awakeningPrice = 0.08 ether;
-    uint256 public wishlistOnePrice = 0.1 ether;
-    uint256 public wishlistTwoPrice = 0.12 ether;
+    uint256 public whitelistOnePrice = 0.1 ether;
+    uint256 public whitelistTwoPrice = 0.12 ether;
     uint256 public publicSalePrice;
     uint256 public awakeningStart= 	1643851800;
-    uint256 public wishlistOneStart = 1644017400;
-    uint256 public wishlistTwoStart = 1644197400;
+    uint256 public whitelistOneStart = 1644017400;
+    uint256 public whitelistTwoStart = 1644197400;
     uint256 public publicSaleStart = 1644283800;
     uint256 public awakeningEnd= 1643862600;
-    uint256 public wishlistOneEnd = 1644028200;
-    uint256 public wishlistTwoEnd = 1644211800;
+    uint256 public whitelistOneEnd = 1644028200;
+    uint256 public whitelistTwoEnd = 1644211800;
     uint256 public awakeningPerTransactionLimit = 24;
-    uint256 public wishlistOnePerTransactionLimit = 12;
-    uint256 public wishlistTwoPerTransactionLimit = 12;
+    uint256 public whitelistOnePerTransactionLimit = 12;
+    uint256 public whitelistTwoPerTransactionLimit = 12;
     uint256 public publicSalePerTransactionLimit = 12;
     uint256 public teamLimt = 377;
     mapping(address => uint256) public userAwakeningTransactions;
@@ -1159,10 +1159,12 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
     uint256 public whitelistTwoSold;
     uint256 public publicSaleSold;
     uint256 public TeamWalletMinted;
+    address public TeamWallet;
 
     
 
-    constructor(string memory NAME, string memory SYMBOL) ERC721(NAME,SYMBOL) {
+    constructor(string memory NAME, string memory SYMBOL, address _teamWallet) ERC721(NAME,SYMBOL) {
+    TeamWallet = _teamWallet;
     }
 
    event Minted (uint256 _NftId, string msg);
@@ -1187,30 +1189,41 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
         return (NftId); 
     }
     // function to mint multiple nfts
-    function batchMint( uint256 numberOfNfts) external nonReentrant {
+    function batchMint( uint256 numberOfNfts) external payable nonReentrant {
     if(block.timestamp> awakeningStart && block.timestamp< awakeningStart){
         awakeningSold = awakeningSold + numberOfNfts;
         require(awakeningSold<= awakeningLimit,"Awakening Sale Limit Exceeded");
         require(numberOfNfts <= awakeningPerTransactionLimit,"Please Mint less than 24");
+        require(msg.value >= numberOfNfts*awakeningPrice, "Please Enter Correct Amount");
+        payable(TeamWallet).transfer(msg.value);
         awakeningMint(msg.sender, numberOfNfts);
     }
-    else if(block.timestamp> wishlistOneStart && block.timestamp< wishlistOneEnd){
+    else if(block.timestamp> whitelistOneStart && block.timestamp< whitelistOneEnd){
         whitelistOneSold = whitelistOneSold + numberOfNfts;
         require(whitelistOneSold<= awakeningLimit,"Whitelist One Sale Limit Exceeded");
-        require(numberOfNfts <= wishlistOnePerTransactionLimit,"Please Mint less than 12");
+        require(numberOfNfts <= whitelistOnePerTransactionLimit,"Please Mint less than 12");
+        require(msg.value >= numberOfNfts*whitelistOnePrice, "Please Enter Correct Amount");
+        payable(TeamWallet).transfer(msg.value);
         whitelistOneMint(msg.sender, numberOfNfts);
     }
-    else if(block.timestamp> wishlistTwoStart && block.timestamp< wishlistTwoEnd){
+    else if(block.timestamp> whitelistTwoStart && block.timestamp< whitelistTwoEnd){
         whitelistTwoSold = whitelistTwoSold + numberOfNfts;
         require(whitelistTwoSold<= whitelistTwoSold,"Whitelist Two Sale Limit Exceeded");
-        require(numberOfNfts <= wishlistTwoPerTransactionLimit,"Please Mint less than 12");
+        require(numberOfNfts <= whitelistTwoPerTransactionLimit,"Please Mint less than 12");
+        require(msg.value >= numberOfNfts*whitelistTwoPrice, "Please Enter Correct Amount");
+        payable(TeamWallet).transfer(msg.value);
         whitelistTwoMint(msg.sender, numberOfNfts);
     }
     else if(block.timestamp> publicSalePrice){
         require(numberOfNfts <= publicSalePerTransactionLimit,"Please Mint less than 12");
+        require(msg.value >= numberOfNfts*publicSalePrice, "Please Enter Correct Amount");
+        payable(TeamWallet).transfer(msg.value);
         publicSaleMint(msg.sender, numberOfNfts);
     }    
-        
+           
+
+    emit BatchMint(numberOfNfts,"Minted succesfully");
+
     }
 
     function awakeningMint(address creator, uint256 numberOfNfts) private{
@@ -1279,7 +1292,7 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
         return(_tokenIdTracker.current());
     }
 
-    function teamMint(uint256 numberOfNfts, address TeamWallet) external onlyOwner{
+    function teamMint(uint256 numberOfNfts) external onlyOwner{
         TeamWalletMinted = TeamWalletMinted + numberOfNfts;
         require(TeamWalletMinted < teamLimt, " Mint limit exceeded");
         for(uint256 i=0; i< numberOfNfts; i++){
@@ -1304,7 +1317,7 @@ function getNFTMintedByUser(address user) external view returns (uint256[] memor
 
         return _tokenURI;
     }
-function UpdateTokenURI(uint256[] memory tokenId, string[] memory _tokenURI)
+function revealNft(uint256[] memory tokenId, string[] memory _tokenURI)
        external onlyOwner
     { 
         require(tokenId.length == _tokenURI.length,"Invalid Input");
