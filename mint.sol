@@ -446,7 +446,7 @@ library Address {
  * @dev Provides information about the current execution context, including the
  * sender of the transaction and its data. While these are generally available
  * via msg.sender and msg.data, they should not be accessed in such a direct
- * manner, since when dealing with meta-transactions the account sending and
+ * manner, since when dealing with meta-Limit the account sending and
  * paying for execution may not be the actual sender (as far as an application
  * is concerned).
  *
@@ -1144,15 +1144,11 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
     uint256 public awakeningEnd= 1643862600;
     uint256 public whitelistOneEnd = 1644028200;
     uint256 public whitelistTwoEnd = 1644211800;
-    uint256 public awakeningPerTransactionLimit = 24;
-    uint256 public whitelistOnePerTransactionLimit = 12;
-    uint256 public whitelistTwoPerTransactionLimit = 12;
-    uint256 public publicSalePerTransactionLimit = 12;
     uint256 public teamLimt = 377;
-    mapping(address => uint256) public userAwakeningTransactions;
-    mapping(address => uint256) public userWhitelistOneTransactions;
-    mapping(address => uint256) public userWhitelistTwoTransactions;
-    mapping(address => uint256) public userPublicSaleTransactions;
+    mapping(address => uint256) public userAwakeningLimit;
+    mapping(address => uint256) public userWhitelistOneLimit;
+    mapping(address => uint256) public userWhitelistTwoLimit;
+    mapping(address => uint256) public userPublicSaleLimit;
     string public baseUri = "abc";
     uint256 public awakeningSold;
     uint256 public whitelistOneSold;
@@ -1171,10 +1167,12 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
    
    event BatchMint(uint256 _totalNft, string msg);
 
+   event Revealed();
+
 
 
     function _mintNft(address creator) 
-    internal 
+    private 
     returns (uint256) 
     {
         uint256 NftId = _tokenIdTracker.current();
@@ -1189,46 +1187,52 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
         return (NftId); 
     }
     // function to mint multiple nfts
-    function batchMint( uint256 numberOfNfts) external payable nonReentrant {
-    if(block.timestamp> awakeningStart && block.timestamp< awakeningStart){
+    function batchMint( uint256 numberOfNfts) external payable nonReentrant returns(bool) {
+    require(block.timestamp>awakeningStart,"Sale not started");
+    if(block.timestamp> awakeningStart && block.timestamp< awakeningEnd){
         awakeningSold = awakeningSold + numberOfNfts;
         require(awakeningSold<= awakeningLimit,"Awakening Sale Limit Exceeded");
-        require(numberOfNfts <= awakeningPerTransactionLimit,"Please Mint less than 24");
         require(msg.value >= numberOfNfts*awakeningPrice, "Please Enter Correct Amount");
         payable(TeamWallet).transfer(msg.value);
         awakeningMint(msg.sender, numberOfNfts);
+        emit BatchMint(numberOfNfts," Awakening Minted succesfully");
+        return(true);
     }
     else if(block.timestamp> whitelistOneStart && block.timestamp< whitelistOneEnd){
         whitelistOneSold = whitelistOneSold + numberOfNfts;
         require(whitelistOneSold<= awakeningLimit,"Whitelist One Sale Limit Exceeded");
-        require(numberOfNfts <= whitelistOnePerTransactionLimit,"Please Mint less than 12");
         require(msg.value >= numberOfNfts*whitelistOnePrice, "Please Enter Correct Amount");
         payable(TeamWallet).transfer(msg.value);
         whitelistOneMint(msg.sender, numberOfNfts);
+          emit BatchMint(numberOfNfts," Whitelist One Minted succesfully");
+           return(true);
     }
     else if(block.timestamp> whitelistTwoStart && block.timestamp< whitelistTwoEnd){
         whitelistTwoSold = whitelistTwoSold + numberOfNfts;
         require(whitelistTwoSold<= whitelistTwoSold,"Whitelist Two Sale Limit Exceeded");
-        require(numberOfNfts <= whitelistTwoPerTransactionLimit,"Please Mint less than 12");
         require(msg.value >= numberOfNfts*whitelistTwoPrice, "Please Enter Correct Amount");
         payable(TeamWallet).transfer(msg.value);
         whitelistTwoMint(msg.sender, numberOfNfts);
+        emit BatchMint(numberOfNfts,"Whitelist Two Minted succesfully");
+        return(true);
+
     }
     else if(block.timestamp> publicSalePrice){
-        require(numberOfNfts <= publicSalePerTransactionLimit,"Please Mint less than 12");
         require(msg.value >= numberOfNfts*publicSalePrice, "Please Enter Correct Amount");
         payable(TeamWallet).transfer(msg.value);
         publicSaleMint(msg.sender, numberOfNfts);
-    }    
+         emit BatchMint(numberOfNfts,"Public Sale Minted succesfully");
+         return(true);
+    } 
+    else{
+         return(false);
+    }   
            
-
-    emit BatchMint(numberOfNfts,"Minted succesfully");
-
     }
 
     function awakeningMint(address creator, uint256 numberOfNfts) private{
-        userAwakeningTransactions[creator]++ ;
-        require(userAwakeningTransactions[creator]<25,"Minting Limit Exceeded");
+        userAwakeningLimit[creator] = userAwakeningLimit[creator] + numberOfNfts;
+        require(userAwakeningLimit[creator]<= awakeningUserLimit,"Minting Limit Exceeded");
         for(uint256 i = 0; i< numberOfNfts; i++){
         _mintNft(creator);
         }
@@ -1236,8 +1240,8 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
     }
 
     function whitelistOneMint(address creator, uint256 numberOfNfts) private{
-        userWhitelistOneTransactions[creator]++ ;
-        require(userWhitelistOneTransactions[creator]<25,"Minting Limit Exceeded");
+        userWhitelistOneLimit[creator] = userWhitelistOneLimit[creator] + numberOfNfts;
+        require(userWhitelistOneLimit[creator]<= whitelistOneUserLimit,"Minting Limit Exceeded"); 
         for(uint256 i = 0; i< numberOfNfts; i++){
         _mintNft(creator);
         }
@@ -1245,8 +1249,8 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
     }
 
     function whitelistTwoMint(address creator, uint256 numberOfNfts) private{
-         userWhitelistTwoTransactions[creator]++ ;
-        require(userWhitelistTwoTransactions[creator]<25,"Minting Limit Exceeded");
+        userWhitelistTwoLimit[creator] = userWhitelistTwoLimit[creator] + numberOfNfts;
+        require(userWhitelistTwoLimit[creator]<= whitelistTwoUserLimit,"Minting Limit Exceeded"); 
         for(uint256 i = 0; i< numberOfNfts; i++){
         _mintNft(creator);
         }
@@ -1254,8 +1258,8 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
     }
 
     function publicSaleMint(address creator, uint256 numberOfNfts) private{
-         userPublicSaleTransactions[creator]++ ;
-        require(userPublicSaleTransactions[creator]<25,"Minting Limit Exceeded");
+        userPublicSaleLimit[creator] = userPublicSaleLimit[creator] + numberOfNfts;
+        require(userPublicSaleLimit[creator]<= publicSaleUserLimit,"Minting Limit Exceeded");  
         for(uint256 i = 0; i< numberOfNfts; i++){
         _mintNft(creator);
         }
@@ -1286,6 +1290,8 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
         require(_exists(tokenId[i]), "ERC721Metadata: URI query for nonexistent token");
         _tokenURIs[tokenId[i]] = _tokenURI[i];
         }
+
+        emit Revealed();
     }
    // returns the total amount of NFTs minted
     function getTokenCounter() external view returns (uint256 tracker){
@@ -1317,14 +1323,7 @@ function getNFTMintedByUser(address user) external view returns (uint256[] memor
 
         return _tokenURI;
     }
-function revealNft(uint256[] memory tokenId, string[] memory _tokenURI)
-       external onlyOwner
-    { 
-        require(tokenId.length == _tokenURI.length,"Invalid Input");
-        for(uint256 i =0; i< tokenId.length; i++){
-        _setTokenURI(tokenId[i],_tokenURI[i]);
-        }
-    }    
+
 function ownerOfTokenId(address user) external view returns(uint256[] memory ids){
   uint256 count = 0;
   for(uint256 i=0; i<_tokenIdTracker.current();i++){
