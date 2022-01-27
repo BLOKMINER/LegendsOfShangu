@@ -1137,6 +1137,7 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
     uint256 public whitelistOnePrice = 0.1 ether;
     uint256 public whitelistTwoPrice = 0.12 ether;
     uint256 public publicSalePrice;
+    bool public publicSalePriceSet;
     uint256 public awakeningStart= 	1643851800;
     uint256 public whitelistOneStart = 1644017400;
     uint256 public whitelistTwoStart = 1644197400;
@@ -1186,7 +1187,7 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
 
    event Revealed();
 
-
+   event PriceSet(uint256 price);
 
     function _mintNft(address creator) 
     private 
@@ -1259,6 +1260,7 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
 
     }
     else if(block.timestamp> publicSaleStart){ 
+        require(publicSalePriceSet == true,"Price not set");
         totalSale = totalSale+numberOfNfts;
         require(totalSale<= publicSaleLimit,"Total Supply Reached");
         require(msg.value >= numberOfNfts*publicSalePrice, "Please Enter Correct Amount");
@@ -1315,6 +1317,12 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
 
         
     }
+
+    function setPublicSalePrice(uint256 price) external onlyOwner{
+     publicSalePrice = price;
+     publicSalePriceSet = true;
+     emit PriceSet(price);
+    } 
    
     // returns minter of a token
      function minterOfToken(uint256 tokenId) external view returns (address _minter){
