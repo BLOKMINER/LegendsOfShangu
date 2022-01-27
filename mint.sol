@@ -1128,7 +1128,7 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
     uint256 public awakeningLimit = 2623;
     uint256 public whitelistOneLimit = 2000;
     uint256 public whitelistTwoLimit = 1000;
-    uint256 public publicSaleLimit = 7777;
+    uint256 public publicSaleLimit = 7400;
     uint256 public awakeningUserLimit = 24;
     uint256 public whitelistOneUserLimit = 12;
     uint256 public whitelistTwoUserLimit = 12;
@@ -1145,12 +1145,15 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
     uint256 public awakeningEnd= 1643862600;
     uint256 public whitelistOneEnd = 1644028200;
     uint256 public whitelistTwoEnd = 1644211800;
-    uint256 public teamLimt = 377;
+    uint256 public teamLimit = 377;
     mapping(address => uint256) public userAwakeningLimit;
     mapping(address => uint256) public userWhitelistOneLimit;
     mapping(address => uint256) public userWhitelistTwoLimit;
     mapping(address => uint256) public userPublicSaleLimit;
     mapping(uint256 => bool) public revealed;
+    mapping(address => bool) public awakeningWhitelisted;
+    mapping(address => bool) public whitelistOneWhitelisted;
+    mapping(address => bool) public whitelistTwoWhitelisted;
     string public baseUri = "abc";
     uint256 public awakeningSold;
     uint256 public whitelistOneSold;
@@ -1208,6 +1211,7 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
     function batchMint( uint256 numberOfNfts) external payable nonReentrant returns(bool) {
     require(block.timestamp>awakeningStart,"Sale not started");
     if(block.timestamp> awakeningStart && block.timestamp< awakeningEnd){
+        require(awakeningWhitelisted[msg.sender]==true,"User not whitelisted");
         awakeningSold = awakeningSold + numberOfNfts;
         require(awakeningSold<= awakeningLimit,"Awakening Sale Limit Exceeded");
         require(msg.value >= numberOfNfts*awakeningPrice, "Please Enter Correct Amount");
@@ -1225,6 +1229,7 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
         return(true);
     }
     else if(block.timestamp> whitelistOneStart && block.timestamp< whitelistOneEnd){
+        require(whitelistOneWhitelisted[msg.sender]==true,"User not whitelisted");
         whitelistOneSold = whitelistOneSold + numberOfNfts;
         require(whitelistOneSold<= whitelistOneLimit,"Whitelist One Sale Limit Exceeded");
         require(msg.value >= numberOfNfts*whitelistOnePrice, "Please Enter Correct Amount");
@@ -1242,6 +1247,7 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
            return(true);
     }
     else if(block.timestamp> whitelistTwoStart && block.timestamp< whitelistTwoEnd){
+        require(whitelistTwoWhitelisted[msg.sender]==true,"User not whitelisted");
         whitelistTwoSold = whitelistTwoSold + numberOfNfts;
         require(whitelistTwoSold<= whitelistTwoLimit,"Whitelist Two Sale Limit Exceeded");
         require(msg.value >= numberOfNfts*whitelistTwoPrice, "Please Enter Correct Amount");
@@ -1318,6 +1324,24 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
         
     }
 
+    function whitelistUsersForAwakening(address[] memory user) external onlyOwner{
+         for(uint256 i=0; i<user.length;i++){
+             awakeningWhitelisted[user[i]] = true;
+         }
+    }
+
+    function whitelistUsersForWhitelistOne(address[] memory user) external onlyOwner{
+         for(uint256 i=0; i<user.length;i++){
+             whitelistOneWhitelisted[user[i]] = true;
+         }
+    } 
+
+    function whitelistUsersForWhitelistTwo(address[] memory user) external onlyOwner{
+         for(uint256 i=0; i<user.length;i++){
+             whitelistTwoWhitelisted[user[i]] = true;
+         }
+    }
+
     function setPublicSalePrice(uint256 price) external onlyOwner{
      publicSalePrice = price;
      publicSalePriceSet = true;
@@ -1358,9 +1382,9 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
 
     function teamMint(uint256 numberOfNfts) external onlyOwner{
         TeamWalletMinted = TeamWalletMinted + numberOfNfts;
-        require(TeamWalletMinted <= teamLimt, " Mint limit exceeded");
+        require(TeamWalletMinted <= teamLimit, " Mint limit exceeded");
         for(uint256 i=0; i< numberOfNfts; i++){
-        _mintNft(TeamWallet1);
+        _mintNft(msg.sender);
         }
     }
 
