@@ -1126,8 +1126,8 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
     mapping(uint256 => address) public minter;   //returs minter of a token id
     mapping(address => uint256[]) public mintedByUser;
     uint256 public awakeningLimit = 2623;
-    uint256 public whitelistOneLimit = 5000;
-    uint256 public whitelistTwoLimit = 6500;
+    uint256 public whitelistOneLimit = 2000;
+    uint256 public whitelistTwoLimit = 1000;
     uint256 public publicSaleLimit = 7777;
     uint256 public awakeningUserLimit = 24;
     uint256 public whitelistOneUserLimit = 12;
@@ -1149,18 +1149,35 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
     mapping(address => uint256) public userWhitelistOneLimit;
     mapping(address => uint256) public userWhitelistTwoLimit;
     mapping(address => uint256) public userPublicSaleLimit;
+    mapping(uint256 => bool) public revealed;
     string public baseUri = "abc";
     uint256 public awakeningSold;
     uint256 public whitelistOneSold;
     uint256 public whitelistTwoSold;
     uint256 public publicSaleSold;
     uint256 public TeamWalletMinted;
-    address public TeamWallet;
+    uint256 public totalSale;
+    address public TeamWallet1;
+    address public TeamWallet2;
+    address public TeamWallet3;
+    address public TeamWallet4;
+    address public TeamWallet5;
+    address public TeamWallet6;
+    address public TeamWallet7;
+    address public TeamWallet8;
 
     
 
-    constructor(string memory NAME, string memory SYMBOL, address _teamWallet) ERC721(NAME,SYMBOL) {
-    TeamWallet = _teamWallet;
+    constructor(string memory NAME, string memory SYMBOL, address _teamWallet1, address _teamWallet2, address _teamWallet3, address _teamWallet4 ,
+    address _teamWallet5, address _teamWallet6, address _teamWallet7,  address _teamWallet8 ) ERC721(NAME,SYMBOL) {
+    TeamWallet1 = _teamWallet1;
+    TeamWallet2 = _teamWallet2;
+    TeamWallet3 = _teamWallet3;
+    TeamWallet4 = _teamWallet4;
+    TeamWallet5 = _teamWallet5;
+    TeamWallet6 = _teamWallet6;
+    TeamWallet7 = _teamWallet7;
+    TeamWallet8 = _teamWallet8;
     }
 
    event Minted (uint256 _NftId, string msg);
@@ -1193,34 +1210,66 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
         awakeningSold = awakeningSold + numberOfNfts;
         require(awakeningSold<= awakeningLimit,"Awakening Sale Limit Exceeded");
         require(msg.value >= numberOfNfts*awakeningPrice, "Please Enter Correct Amount");
-        payable(TeamWallet).transfer(msg.value);
+        payable(TeamWallet1).transfer(msg.value/8);
+        payable(TeamWallet2).transfer(msg.value/8);
+        payable(TeamWallet3).transfer(msg.value/8);
+        payable(TeamWallet4).transfer(msg.value/8);
+        payable(TeamWallet5).transfer(msg.value/8);
+        payable(TeamWallet6).transfer(msg.value/8);
+        payable(TeamWallet7).transfer(msg.value/8);
+        payable(TeamWallet8).transfer(msg.value/8);
         awakeningMint(msg.sender, numberOfNfts);
+        totalSale = totalSale+numberOfNfts;
         emit BatchMint(numberOfNfts," Awakening Minted succesfully");
         return(true);
     }
     else if(block.timestamp> whitelistOneStart && block.timestamp< whitelistOneEnd){
         whitelistOneSold = whitelistOneSold + numberOfNfts;
-        require(whitelistOneSold<= awakeningLimit,"Whitelist One Sale Limit Exceeded");
+        require(whitelistOneSold<= whitelistOneLimit,"Whitelist One Sale Limit Exceeded");
         require(msg.value >= numberOfNfts*whitelistOnePrice, "Please Enter Correct Amount");
-        payable(TeamWallet).transfer(msg.value);
+        payable(TeamWallet1).transfer(msg.value/8);
+        payable(TeamWallet2).transfer(msg.value/8);
+        payable(TeamWallet3).transfer(msg.value/8);
+        payable(TeamWallet4).transfer(msg.value/8);
+        payable(TeamWallet5).transfer(msg.value/8);
+        payable(TeamWallet6).transfer(msg.value/8);
+        payable(TeamWallet7).transfer(msg.value/8);
+        payable(TeamWallet8).transfer(msg.value/8);
         whitelistOneMint(msg.sender, numberOfNfts);
+        totalSale = totalSale+numberOfNfts;
           emit BatchMint(numberOfNfts," Whitelist One Minted succesfully");
            return(true);
     }
     else if(block.timestamp> whitelistTwoStart && block.timestamp< whitelistTwoEnd){
         whitelistTwoSold = whitelistTwoSold + numberOfNfts;
-        require(whitelistTwoSold<= whitelistTwoSold,"Whitelist Two Sale Limit Exceeded");
+        require(whitelistTwoSold<= whitelistTwoLimit,"Whitelist Two Sale Limit Exceeded");
         require(msg.value >= numberOfNfts*whitelistTwoPrice, "Please Enter Correct Amount");
-        payable(TeamWallet).transfer(msg.value);
+        payable(TeamWallet1).transfer(msg.value/8);
+        payable(TeamWallet2).transfer(msg.value/8);
+        payable(TeamWallet3).transfer(msg.value/8);
+        payable(TeamWallet4).transfer(msg.value/8);
+        payable(TeamWallet5).transfer(msg.value/8);
+        payable(TeamWallet6).transfer(msg.value/8);
+        payable(TeamWallet7).transfer(msg.value/8);
+        payable(TeamWallet8).transfer(msg.value/8);
         whitelistTwoMint(msg.sender, numberOfNfts);
+        totalSale = totalSale+numberOfNfts;
         emit BatchMint(numberOfNfts,"Whitelist Two Minted succesfully");
         return(true);
 
     }
-    else if(block.timestamp> publicSalePrice){
+    else if(block.timestamp> publicSaleStart){ 
+        totalSale = totalSale+numberOfNfts;
+        require(totalSale<= publicSaleLimit,"Total Supply Reached");
         require(msg.value >= numberOfNfts*publicSalePrice, "Please Enter Correct Amount");
-        payable(TeamWallet).transfer(msg.value);
-        publicSaleMint(msg.sender, numberOfNfts);
+        payable(TeamWallet1).transfer(msg.value/8);
+        payable(TeamWallet2).transfer(msg.value/8);
+        payable(TeamWallet3).transfer(msg.value/8);
+        payable(TeamWallet4).transfer(msg.value/8);
+        payable(TeamWallet5).transfer(msg.value/8);
+        payable(TeamWallet6).transfer(msg.value/8);
+        payable(TeamWallet7).transfer(msg.value/8);
+        payable(TeamWallet8).transfer(msg.value/8);
          emit BatchMint(numberOfNfts,"Public Sale Minted succesfully");
          return(true);
     } 
@@ -1273,8 +1322,8 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
     }
     // sets uri for a token
     function _setTokenURI(uint256 tokenId, string memory _tokenURI)
-        internal 
-        virtual
+        private 
+    
     {
         require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
         _tokenURIs[tokenId] = _tokenURI;
@@ -1287,8 +1336,9 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
     {   require(tokenId.length == _tokenURI.length,"Invalid Input");
         uint256 entry = tokenId.length;
         for(uint256 i= 0; i<entry ; i++){
-        require(_exists(tokenId[i]), "ERC721Metadata: URI query for nonexistent token");
-        _tokenURIs[tokenId[i]] = _tokenURI[i];
+        require(revealed[tokenId[i]]==false,"Already revealed");
+        revealed[tokenId[i]]= true;
+        _setTokenURI(tokenId[i],_tokenURI[i]);
         }
 
         emit Revealed();
@@ -1300,9 +1350,9 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
 
     function teamMint(uint256 numberOfNfts) external onlyOwner{
         TeamWalletMinted = TeamWalletMinted + numberOfNfts;
-        require(TeamWalletMinted < teamLimt, " Mint limit exceeded");
+        require(TeamWalletMinted <= teamLimt, " Mint limit exceeded");
         for(uint256 i=0; i< numberOfNfts; i++){
-        _mintNft(TeamWallet);
+        _mintNft(TeamWallet1);
         }
     }
 
