@@ -1,4 +1,8 @@
 /**
+ *Submitted for verification at Etherscan.io on 2022-01-27
+*/
+
+/**
  *Submitted for verification at BscScan.com on 2021-12-13
 */
 
@@ -1215,14 +1219,7 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
         awakeningSold = awakeningSold + numberOfNfts;
         require(awakeningSold<= awakeningLimit,"Awakening Sale Limit Exceeded");
         require(msg.value >= numberOfNfts*awakeningPrice, "Please Enter Correct Amount");
-        payable(TeamWallet1).transfer((msg.value)*32/100);
-        payable(TeamWallet1).transfer((msg.value)*25/100);
-        payable(TeamWallet1).transfer((msg.value)*25/100);
-        payable(TeamWallet1).transfer((msg.value)*5/100);
-        payable(TeamWallet1).transfer((msg.value)*3/100);
-        payable(TeamWallet1).transfer((msg.value)*1/100);
-        payable(TeamWallet1).transfer((msg.value)*1/100);
-        payable(TeamWallet1).transfer((msg.value)*8/100);
+        payable(address(this)).transfer(msg.value);
         awakeningMint(msg.sender, numberOfNfts);
         totalSale = totalSale+numberOfNfts;
         emit BatchMint(numberOfNfts," Awakening Minted succesfully");
@@ -1233,14 +1230,7 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
         whitelistOneSold = whitelistOneSold + numberOfNfts;
         require(whitelistOneSold<= whitelistOneLimit,"Whitelist One Sale Limit Exceeded");
         require(msg.value >= numberOfNfts*whitelistOnePrice, "Please Enter Correct Amount");
-        payable(TeamWallet1).transfer((msg.value)*32/100);
-        payable(TeamWallet1).transfer((msg.value)*25/100);
-        payable(TeamWallet1).transfer((msg.value)*25/100);
-        payable(TeamWallet1).transfer((msg.value)*5/100);
-        payable(TeamWallet1).transfer((msg.value)*3/100);
-        payable(TeamWallet1).transfer((msg.value)*1/100);
-        payable(TeamWallet1).transfer((msg.value)*1/100);
-        payable(TeamWallet1).transfer((msg.value)*8/100);
+        payable(address(this)).transfer(msg.value);
         whitelistOneMint(msg.sender, numberOfNfts);
         totalSale = totalSale+numberOfNfts;
           emit BatchMint(numberOfNfts," Whitelist One Minted succesfully");
@@ -1251,14 +1241,7 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
         whitelistTwoSold = whitelistTwoSold + numberOfNfts;
         require(whitelistTwoSold<= whitelistTwoLimit,"Whitelist Two Sale Limit Exceeded");
         require(msg.value >= numberOfNfts*whitelistTwoPrice, "Please Enter Correct Amount");
-        payable(TeamWallet1).transfer((msg.value)*32/100);
-        payable(TeamWallet1).transfer((msg.value)*25/100);
-        payable(TeamWallet1).transfer((msg.value)*25/100);
-        payable(TeamWallet1).transfer((msg.value)*5/100);
-        payable(TeamWallet1).transfer((msg.value)*3/100);
-        payable(TeamWallet1).transfer((msg.value)*1/100);
-        payable(TeamWallet1).transfer((msg.value)*1/100);
-        payable(TeamWallet1).transfer((msg.value)*8/100);
+        payable(address(this)).transfer(msg.value);
         whitelistTwoMint(msg.sender, numberOfNfts);
         totalSale = totalSale+numberOfNfts;
         emit BatchMint(numberOfNfts,"Whitelist Two Minted succesfully");
@@ -1270,14 +1253,7 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
         totalSale = totalSale+numberOfNfts;
         require(totalSale<= publicSaleLimit,"Total Supply Reached");
         require(msg.value >= numberOfNfts*publicSalePrice, "Please Enter Correct Amount");
-        payable(TeamWallet1).transfer((msg.value)*32/100);
-        payable(TeamWallet1).transfer((msg.value)*25/100);
-        payable(TeamWallet1).transfer((msg.value)*25/100);
-        payable(TeamWallet1).transfer((msg.value)*5/100);
-        payable(TeamWallet1).transfer((msg.value)*3/100);
-        payable(TeamWallet1).transfer((msg.value)*1/100);
-        payable(TeamWallet1).transfer((msg.value)*1/100);
-        payable(TeamWallet1).transfer((msg.value)*8/100);
+        payable(address(this)).transfer(msg.value);
          emit BatchMint(numberOfNfts,"Public Sale Minted succesfully");
          return(true);
     } 
@@ -1287,6 +1263,19 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
            
     }
 
+    function withdrawAmount() external payable onlyOwner{
+        uint256 amount = address(this).balance;
+        payable(TeamWallet1).transfer((amount)*32/100);
+        payable(TeamWallet2).transfer((amount)*25/100);
+        payable(TeamWallet3).transfer((amount)*25/100);
+        payable(TeamWallet4).transfer((amount)*5/100);
+        payable(TeamWallet5).transfer((amount)*3/100);
+        payable(TeamWallet6).transfer((amount)*1/100);
+        payable(TeamWallet7).transfer((amount)*1/100);
+        payable(TeamWallet8).transfer((amount)*8/100);
+
+    }
+ 
     function awakeningMint(address creator, uint256 numberOfNfts) private{
         userAwakeningLimit[creator] = userAwakeningLimit[creator] + numberOfNfts;
         require(userAwakeningLimit[creator]<= awakeningUserLimit,"Minting Limit Exceeded");
@@ -1425,5 +1414,8 @@ function ownerOfTokenId(address user) external view returns(uint256[] memory ids
   }
    return(tokenIds);
 }    
+
+   receive() external payable {}
+    fallback() external payable {}
 
 }
