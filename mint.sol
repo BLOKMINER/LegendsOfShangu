@@ -4,6 +4,7 @@
 
 pragma solidity 0.8.9;
 
+
 /**
  * @dev Interface of the ERC165 standard, as defined in the
  * https://eips.ethereum.org/EIPS/eip-165[EIP].
@@ -1189,14 +1190,14 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
    event AwakeningWhitelist();
 
    event WhitelistOneWhitelist();
-
+ 
    event WhitelistTwoWhitelist();
 
     function _mintNft(address creator) 
     private 
     returns (uint256) 
     { 
-        uint256 NftId = _tokenIdTracker.current();
+        uint256 NftId = _tokenIdTracker.current(); 
         _safeMint(creator, NftId);
         mintedByUser[creator].push(NftId);
         minter[NftId] = creator;
