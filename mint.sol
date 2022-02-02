@@ -1149,7 +1149,7 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
     mapping(address => bool) public awakeningWhitelisted;
     mapping(address => bool) public whitelistOneWhitelisted;
     mapping(address => bool) public whitelistTwoWhitelisted;
-    string public baseUri = "https://legendsofshangu.mypinata.cloud/ipfs/QmcNv6cTg1XtGk9Sz9nEymBbqArxkbiDuh6wNbe76hgD2q";
+    string public baseUri = "https://legendsofshangu.mypinata.cloud/ipfs/QmXZEctx31jg9hQEx9ukeK13YG5SQrBZDjgs8GV83AoBPt";
     uint256 public awakeningSold;
     uint256 public whitelistOneSold;
     uint256 public whitelistTwoSold;
