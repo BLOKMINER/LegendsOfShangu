@@ -1,14 +1,4 @@
-/**
- *Submitted for verification at Etherscan.io on 2022-01-27
-*/
 
-/**
- *Submitted for verification at BscScan.com on 2021-12-13
-*/
-
-/**
- *Submitted for verification at BscScan.com on 2021-12-03
-*/
 
 // SPDX-License-Identifier: MIT
 
@@ -1129,27 +1119,27 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
     mapping(uint256 => string) public _tokenURIs; //returns uris for particular token id
     mapping(uint256 => address) public minter;   //returs minter of a token id
     mapping(address => uint256[]) public mintedByUser;
-    uint256 public awakeningLimit = 2623;
-    uint256 public whitelistOneLimit = 2000;
-    uint256 public whitelistTwoLimit = 1000;
-    uint256 public publicSaleLimit = 7400;
-    uint256 public awakeningUserLimit = 24;
-    uint256 public whitelistOneUserLimit = 12;
-    uint256 public whitelistTwoUserLimit = 12;
-    uint256 public publicSaleUserLimit = 12;
-    uint256 public awakeningPrice = 0.08 ether;
-    uint256 public whitelistOnePrice = 0.1 ether;
-    uint256 public whitelistTwoPrice = 0.12 ether;
+    uint256 public constant awakeningLimit = 2623;
+    uint256 public constant whitelistOneLimit = 2000;
+    uint256 public constant whitelistTwoLimit = 1000;
+    uint256 public constant publicSaleLimit = 7400;
+    uint256 public constant awakeningUserLimit = 24;
+    uint256 public constant whitelistOneUserLimit = 12;
+    uint256 public constant whitelistTwoUserLimit = 12;
+    uint256 public constant publicSaleUserLimit = 12;
+    uint256 public constant awakeningPrice = 0.08 ether;
+    uint256 public constant whitelistOnePrice = 0.1 ether;
+    uint256 public constant whitelistTwoPrice = 0.12 ether;
     uint256 public publicSalePrice;
     bool public publicSalePriceSet;
-    uint256 public awakeningStart= 	1643851800;
-    uint256 public whitelistOneStart = 1644017400;
-    uint256 public whitelistTwoStart = 1644197400;
-    uint256 public publicSaleStart = 1644283800;
-    uint256 public awakeningEnd= 1643862600;
-    uint256 public whitelistOneEnd = 1644028200;
-    uint256 public whitelistTwoEnd = 1644211800;
-    uint256 public teamLimit = 377;
+    uint256 public constant awakeningStart = 1643851800;
+    uint256 public constant whitelistOneStart = 1644017400;
+    uint256 public constant whitelistTwoStart = 1644197400;
+    uint256 public constant publicSaleStart = 1644283800;
+    uint256 public constant awakeningEnd= 1643862600;
+    uint256 public constant whitelistOneEnd = 1644028200;
+    uint256 public constant whitelistTwoEnd = 1644211800;
+    uint256 public constant teamLimit = 377;
     mapping(address => uint256) public userAwakeningLimit;
     mapping(address => uint256) public userWhitelistOneLimit;
     mapping(address => uint256) public userWhitelistTwoLimit;
@@ -1158,7 +1148,7 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
     mapping(address => bool) public awakeningWhitelisted;
     mapping(address => bool) public whitelistOneWhitelisted;
     mapping(address => bool) public whitelistTwoWhitelisted;
-    string public baseUri = "abc";
+    string public baseUri = "https://legendsofshangu.mypinata.cloud/ipfs/QmcNv6cTg1XtGk9Sz9nEymBbqArxkbiDuh6wNbe76hgD2q";
     uint256 public awakeningSold;
     uint256 public whitelistOneSold;
     uint256 public whitelistTwoSold;
@@ -1196,25 +1186,30 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
 
    event PriceSet(uint256 price);
 
+   event AwakeningWhitelist();
+
+   event WhitelistOneWhitelist();
+
+   event WhitelistTwoWhitelist();
+
     function _mintNft(address creator) 
     private 
     returns (uint256) 
-    {
+    { 
         uint256 NftId = _tokenIdTracker.current();
         _safeMint(creator, NftId);
         mintedByUser[creator].push(NftId);
         minter[NftId] = creator;
         _setTokenURI(NftId, baseUri);
         _tokenIdTracker.increment();
-        emit Minted (NftId,"succesfully minted");
+        emit Minted (NftId,"successfully minted");
         
     
         return (NftId); 
     }
     // function to mint multiple nfts
-    function batchMint( uint256 numberOfNfts) external payable nonReentrant returns(bool) {
-    require(block.timestamp>awakeningStart,"Sale not started");
-    if(block.timestamp> awakeningStart && block.timestamp< awakeningEnd){
+    function awakeningMint( uint256 numberOfNfts) external payable nonReentrant returns(bool) {
+    require(block.timestamp> awakeningStart && block.timestamp< awakeningEnd,"Sale Not Started");
         require(awakeningWhitelisted[msg.sender]==true,"User not whitelisted");
         awakeningSold = awakeningSold + numberOfNfts;
         require(awakeningSold<= awakeningLimit,"Awakening Sale Limit Exceeded");
@@ -1222,10 +1217,12 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
         payable(address(this)).transfer(msg.value);
         awakeningMint(msg.sender, numberOfNfts);
         totalSale = totalSale+numberOfNfts;
-        emit BatchMint(numberOfNfts," Awakening Minted succesfully");
+        emit BatchMint(numberOfNfts," Awakening Minted successfully");
         return(true);
+    
     }
-    else if(block.timestamp> whitelistOneStart && block.timestamp< whitelistOneEnd){
+    function whitelistOneMint( uint256 numberOfNfts) external payable nonReentrant returns(bool) {
+    require(block.timestamp> whitelistOneStart && block.timestamp< whitelistOneEnd,"Sale not started");
         require(whitelistOneWhitelisted[msg.sender]==true,"User not whitelisted");
         whitelistOneSold = whitelistOneSold + numberOfNfts;
         require(whitelistOneSold<= whitelistOneLimit,"Whitelist One Sale Limit Exceeded");
@@ -1233,10 +1230,12 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
         payable(address(this)).transfer(msg.value);
         whitelistOneMint(msg.sender, numberOfNfts);
         totalSale = totalSale+numberOfNfts;
-          emit BatchMint(numberOfNfts," Whitelist One Minted succesfully");
+          emit BatchMint(numberOfNfts," Whitelist One Minted successfully");
            return(true);
+    
     }
-    else if(block.timestamp> whitelistTwoStart && block.timestamp< whitelistTwoEnd){
+    function whitelistTwoMint( uint256 numberOfNfts) external payable nonReentrant returns(bool) {
+    require(block.timestamp> whitelistTwoStart && block.timestamp< whitelistTwoEnd,"Sale not started");
         require(whitelistTwoWhitelisted[msg.sender]==true,"User not whitelisted");
         whitelistTwoSold = whitelistTwoSold + numberOfNfts;
         require(whitelistTwoSold<= whitelistTwoLimit,"Whitelist Two Sale Limit Exceeded");
@@ -1244,23 +1243,21 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
         payable(address(this)).transfer(msg.value);
         whitelistTwoMint(msg.sender, numberOfNfts);
         totalSale = totalSale+numberOfNfts;
-        emit BatchMint(numberOfNfts,"Whitelist Two Minted succesfully");
+        emit BatchMint(numberOfNfts,"Whitelist Two Minted successfully");
         return(true);
 
     }
-    else if(block.timestamp> publicSaleStart){ 
+    function publicSaleMint( uint256 numberOfNfts) external payable nonReentrant returns(bool) {
+        require(block.timestamp> publicSaleStart,"Sale not started"); 
         require(publicSalePriceSet == true,"Price not set");
         totalSale = totalSale+numberOfNfts;
         require(totalSale<= publicSaleLimit,"Total Supply Reached");
         require(msg.value >= numberOfNfts*publicSalePrice, "Please Enter Correct Amount");
         payable(address(this)).transfer(msg.value);
-         emit BatchMint(numberOfNfts,"Public Sale Minted succesfully");
+        publicSaleMint(msg.sender, numberOfNfts);
+         emit BatchMint(numberOfNfts,"Public Sale Minted successfully");
          return(true);
-    } 
-    else{
-         return(false);
-    }   
-           
+  
     }
 
     function withdrawAmount() external payable onlyOwner{
@@ -1314,24 +1311,34 @@ contract LegendsOfShangu is ERC721, Ownable, ReentrancyGuard{
     }
 
     function whitelistUsersForAwakening(address[] memory user) external onlyOwner{
-         for(uint256 i=0; i<user.length;i++){
-             awakeningWhitelisted[user[i]] = true;
+        address[] memory _user = user;
+        uint256 length = _user.length;
+         for(uint256 i=0; i<length;i++){ 
+             awakeningWhitelisted[_user[i]] = true;
          }
+        emit AwakeningWhitelist();
     }
 
     function whitelistUsersForWhitelistOne(address[] memory user) external onlyOwner{
-         for(uint256 i=0; i<user.length;i++){
-             whitelistOneWhitelisted[user[i]] = true;
+        address[] memory _user = user;
+        uint256 length = _user.length;
+         for(uint256 i=0; i<length;i++){
+             whitelistOneWhitelisted[_user[i]] = true;
          }
+        emit WhitelistOneWhitelist();
     } 
 
     function whitelistUsersForWhitelistTwo(address[] memory user) external onlyOwner{
-         for(uint256 i=0; i<user.length;i++){
-             whitelistTwoWhitelisted[user[i]] = true;
+        address[] memory _user = user;
+        uint256 length = _user.length;
+         for(uint256 i=0; i<length;i++){
+             whitelistTwoWhitelisted[_user[i]] = true;
          }
+        emit WhitelistTwoWhitelist();
     }
 
     function setPublicSalePrice(uint256 price) external onlyOwner{
+     require(price >0,"Price should be greater than 0");
      publicSalePrice = price;
      publicSalePriceSet = true;
      emit PriceSet(price);
